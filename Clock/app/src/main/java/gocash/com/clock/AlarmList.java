@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -183,11 +184,12 @@ public class AlarmList extends BaseExpandableListAdapter {
      */
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        String title = (String) this.getChild(groupPosition,childPosition);
+        HashMap<String, List<String>> listHashMap = (HashMap<String, List<String>>) this.getChild(groupPosition,childPosition);
         if(convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(R.layout.alarm_list_child, null);
         }
+
 
         return convertView;
     }

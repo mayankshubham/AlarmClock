@@ -3,11 +3,13 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/alarmHeaderColor"
     >
 
     <CheckBox
         android:text="Repeat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/alarm_repeat" />
+        android:id="@+id/alarm_repeat"
+        android:focusable="false"/>
 </LinearLayout>

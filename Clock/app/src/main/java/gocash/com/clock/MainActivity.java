@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     Context context;
     ExpandableListView expandableListView; //
     final List<String> headings = new ArrayList<String>();
-    HashMap<String, HashMap<String, List<String> > > childItems = new HashMap<>();
+    HashMap<String, HashMap<String, List<String> > > childItems = new HashMap<String, HashMap<String, List<String>>>();
     AlarmList alarmList;
 
     @Override
@@ -43,6 +43,16 @@ public class MainActivity extends AppCompatActivity {
 
         alarmList = new AlarmList(this, headings, childItems);
         expandableListView.setAdapter(alarmList);
+
+        //setting an expand group listener
+        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                Log.e("onGroupClick:", "worked");
+                parent.expandGroup(groupPosition);
+                return true;
+            }
+        });
 
 
         // OnClick listener on the FAB icon
@@ -91,6 +101,11 @@ public class MainActivity extends AppCompatActivity {
     public void onConfirmAlarm(String value) {
         Log.e("Time in main activity", value);
         headings.add(value);
+        HashMap<String, List<String>> innerList = new HashMap<String, List<String>>();
+        List<String> repeatValue = new ArrayList<String>();
+        repeatValue.add("false");
+        innerList.put("Repeat", repeatValue);
+        childItems.put(headings.get(headings.size() - 1), innerList);
         alarmList.setAlarm_headers(headings);
         alarmList.setAlarm_list_children(childItems);
         expandableListView.setAdapter(alarmList);

@@ -64,6 +64,8 @@ public class AlarmPopupActivity extends android.support.v4.app.DialogFragment im
                 //MainActivity instance and passing value
                 MainActivity mainActivity = (MainActivity)getActivity();
                 mainActivity.onConfirmAlarm(TimeString);
+
+                //Dismissing the popup window
                 this.dismiss();
                 break;
         }
