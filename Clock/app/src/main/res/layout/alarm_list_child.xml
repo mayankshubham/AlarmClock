@@ -6,10 +6,24 @@
     android:background="@color/alarmHeaderColor"
     >
 
-    <CheckBox
+    <TextView
         android:text="Repeat"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/alarm_repeat"
-        android:focusable="false"/>
+        android:layout_height="40dp"
+        android:focusable="false"
+        android:id="@+id/alarm_repeat_btn" />
+
+    <TextView
+        android:text="Ringtone"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:focusable="false"
+        android:id="@+id/alarm_ringtone" />
+
+    <TextView
+        android:text="Delete"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:focusable="false"
+        android:id="@+id/delete_alarm_icon" />
 </LinearLayout>

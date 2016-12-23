@@ -6,9 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.CheckBox;
 import android.widget.TextView;
-
+import android.support.v4.app.Fragment;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,6 +21,7 @@ public class AlarmList extends BaseExpandableListAdapter {
     private HashMap<String, HashMap<String, List<String> > > alarm_list_children;
     private Context context;
 
+    private static final String DIALOG_SINGLE_CHOICE_LIST = "MainActivity.AlarmRepeatSettings";
 
     public List<String> getAlarm_headers() {
         return alarm_headers;
@@ -191,6 +191,14 @@ public class AlarmList extends BaseExpandableListAdapter {
         }
 
 
+        TextView alarm_repeat_btn = (TextView) convertView.findViewById(R.id.alarm_repeat_btn);
+        alarm_repeat_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlarmRepeatSettings alarmRepeatSettings = AlarmRepeatSettings.newInstance();
+                alarmRepeatSettings.show(((MainActivity)context).getSupportFragmentManager(), DIALOG_SINGLE_CHOICE_LIST);
+            }
+        });
         return convertView;
     }
 

@@ -15,12 +15,13 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  implements TimePickerFragment.TimeDialogListner{
 
     // Defining the Alarm manager variables
     AlarmManager alarm_manager;      /// An alarm instance
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     final List<String> headings = new ArrayList<String>();
     HashMap<String, HashMap<String, List<String> > > childItems = new HashMap<String, HashMap<String, List<String>>>();
     AlarmList alarmList;
+    private static final String DIALOG_TIME = "MainActivity.TimeDialog";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,33 +46,37 @@ public class MainActivity extends AppCompatActivity {
         alarmList = new AlarmList(this, headings, childItems);
         expandableListView.setAdapter(alarmList);
 
-        //setting an expand group listener
-        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                Log.e("onGroupClick:", "worked");
-                parent.expandGroup(groupPosition);
-                return true;
-            }
-        });
-
-
+        
         // OnClick listener on the FAB icon
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_alarm);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                android.support.v4.app.FragmentTransaction manager = getSupportFragmentManager().beginTransaction();
-                // Open the popup activity
-                AlarmPopupActivity pop = new AlarmPopupActivity();
-                pop.show(manager, null);
+
+                TimePickerFragment dialog = new TimePickerFragment();
+                dialog.show(getSupportFragmentManager(), DIALOG_TIME);
             }
         });
+
 
 
         this.context = this;        // setting the context variable
 
 
+    }
+
+    @Override
+    public void onFinishDialog(String Time) {
+        Log.d("Time: ", Time);
+        headings.add(Time);
+        HashMap<String, List<String>> innerList = new HashMap<String, List<String>>();
+        List<String> repeatValue = new ArrayList<String>();
+        repeatValue.add("false");
+        innerList.put("Repeat", repeatValue);
+        childItems.put(headings.get(headings.size() - 1), innerList);
+        alarmList.setAlarm_headers(headings);
+        alarmList.setAlarm_list_children(childItems);
+        expandableListView.setAdapter(alarmList);
     }
 
     @Override
@@ -97,17 +103,16 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // A  function accessible by AlarmPopupActivity to send the value
-    public void onConfirmAlarm(String value) {
-        Log.e("Time in main activity", value);
-        headings.add(value);
-        HashMap<String, List<String>> innerList = new HashMap<String, List<String>>();
-        List<String> repeatValue = new ArrayList<String>();
-        repeatValue.add("false");
-        innerList.put("Repeat", repeatValue);
-        childItems.put(headings.get(headings.size() - 1), innerList);
-        alarmList.setAlarm_headers(headings);
-        alarmList.setAlarm_list_children(childItems);
-        expandableListView.setAdapter(alarmList);
-    }
+//    // A  function accessible by AlarmPopupActivity to send the value
+//    public void onConfirmAlarm(String value) {
+//        headings.add(value);
+//        HashMap<String, List<String>> innerList = new HashMap<String, List<String>>();
+//        List<String> repeatValue = new ArrayList<String>();
+//        repeatValue.add("false");
+//        innerList.put("Repeat", repeatValue);
+//        childItems.put(headings.get(headings.size() - 1), innerList);
+//        alarmList.setAlarm_headers(headings);
+//        alarmList.setAlarm_list_children(childItems);
+//        expandableListView.setAdapter(alarmList);
+//    }
 }

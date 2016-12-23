@@ -3,4 +3,10 @@
     <string name="action_settings">Settings</string>
     <string name="confirm_alarm">Ok</string>
     <string name="cancel_alarm">Cancel</string>
+    <string-array name="alarm_repeat_interval">
+        <item>Custom</item>
+        <item>Weekday(Mon-Fri)</item>
+        <item>Weekend(Sat,Sun)</item>
+    </string-array>
+
 </resources>
