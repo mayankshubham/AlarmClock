@@ -1,6 +1,8 @@
 package gocash.com.clock;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -183,7 +185,7 @@ public class AlarmList extends BaseExpandableListAdapter {
      * @return the View corresponding to the child at the specified position
      */
     @Override
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+    public View getChildView(final int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         HashMap<String, List<String>> listHashMap = (HashMap<String, List<String>>) this.getChild(groupPosition,childPosition);
         if(convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -197,6 +199,32 @@ public class AlarmList extends BaseExpandableListAdapter {
             public void onClick(View v) {
                 AlarmRepeatSettings alarmRepeatSettings = AlarmRepeatSettings.newInstance();
                 alarmRepeatSettings.show(((MainActivity)context).getSupportFragmentManager(), DIALOG_SINGLE_CHOICE_LIST);
+            }
+        });
+        TextView alarm_delete_btn = (TextView) convertView.findViewById(R.id.delete_alarm_icon);
+        alarm_delete_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Delete Alert")
+                        .setMessage("Are you sure to delete alarm")
+                        .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                alarm_list_children.remove(alarm_headers.get(groupPosition));
+                                alarm_headers.remove(groupPosition);
+                                notifyDataSetChanged();
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("Reject", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
             }
         });
         return convertView;
@@ -213,4 +241,7 @@ public class AlarmList extends BaseExpandableListAdapter {
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return false;
     }
+
+
+
 }

@@ -17,20 +17,30 @@ import android.widget.ExpandableListView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity  implements TimePickerFragment.TimeDialogListner{
+public class MainActivity extends AppCompatActivity  implements TimePickerFragment.TimeDialogListner, AlarmRepeatSettings.RepeatDialogListner, CustomDayRepeatFragment.DayRepeatListner{
 
     // Defining the Alarm manager variables
     AlarmManager alarm_manager;      /// An alarm instance
     Context context;
     ExpandableListView expandableListView; //
-    final List<String> headings = new ArrayList<String>();
+    List<String> headings = new ArrayList<String>();
     HashMap<String, HashMap<String, List<String> > > childItems = new HashMap<String, HashMap<String, List<String>>>();
     AlarmList alarmList;
     private static final String DIALOG_TIME = "MainActivity.TimeDialog";
+    private static final String DIALOG_REPEAT_SETTING = "MainActivity.RepeatDialog";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +56,7 @@ public class MainActivity extends AppCompatActivity  implements TimePickerFragme
         alarmList = new AlarmList(this, headings, childItems);
         expandableListView.setAdapter(alarmList);
 
-        
+
         // OnClick listener on the FAB icon
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_alarm);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -65,6 +75,78 @@ public class MainActivity extends AppCompatActivity  implements TimePickerFragme
 
     }
 
+    /**
+     * Dispatch onPause() to fragments.
+     */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //saving the expanded view headings
+        File headerFile = new File(getDir("ClockMap", MODE_PRIVATE), "list");
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(headerFile));
+            outputStream.writeObject(headings);
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //saving the expanded view childitems
+        File file = new File(getDir("ClockMap", MODE_PRIVATE), "map");
+
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
+            outputStream.writeObject(childItems);
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Dispatch onResume() to fragments.  Note that for better inter-operation
+     * with older versions of the platform, at the point of this call the
+     * fragments attached to the activity are <em>not</em> resumed.  This means
+     * that in some cases the previous state may still be saved, not allowing
+     * fragment transactions that modify the state.  To correctly interact
+     * with fragments in their proper state, you should instead override
+     * {@link #onResumeFragments()}.
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //loading the expanded view headings
+        File headerFile = new File(getDir("ClockMap", MODE_PRIVATE), "list");
+       try {
+           ObjectInputStream inputStream  = new ObjectInputStream(new FileInputStream(headerFile));
+           headings = (List<String>) inputStream.readObject();
+           inputStream.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+           e.printStackTrace();
+       }
+        File childFile = new File(getDir("ClockMap", MODE_PRIVATE), "map");
+        try {
+            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(childFile));
+            childItems = (HashMap<String, HashMap<String, List<String> > >) inputStream.readObject();
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        expandableListView = (ExpandableListView) findViewById(R.id.alarm_list);
+
+        alarmList = new AlarmList(this, headings, childItems);
+        expandableListView.setAdapter(alarmList);
+    }
+
+    //Creating an expandable List view
     @Override
     public void onFinishDialog(String Time) {
         Log.d("Time: ", Time);
@@ -101,6 +183,27 @@ public class MainActivity extends AppCompatActivity  implements TimePickerFragme
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    //Method to get the repeat alarm setting value
+    @Override
+    public void onFinishRepeatDialog(String value) {
+
+        if(value.equals("Custom")) {
+            Log.d("In Finish", value);
+            CustomDayRepeatFragment dialog = new CustomDayRepeatFragment();
+            dialog.show(getSupportFragmentManager(), DIALOG_REPEAT_SETTING);
+        } else if(value.equals("Weekday(Mon-Fri)")) {
+            Log.d("In weekday", value);
+        } else if(value.equals("Weekend(Sat,Sun)")) {
+            Log.d("In weekday", value);
+        }
+    }
+
+    //callback interface to get the days selected value in case of custom select
+    @Override
+    public void onFinishDayRepeatListner(List<String> days) {
+
     }
 
 //    // A  function accessible by AlarmPopupActivity to send the value

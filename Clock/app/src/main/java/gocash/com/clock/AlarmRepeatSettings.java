@@ -13,6 +13,11 @@ import android.support.v4.app.DialogFragment;
 
 public class AlarmRepeatSettings extends DialogFragment {
 
+    //public interface to send the value to main activity
+    public interface RepeatDialogListner {
+        void onFinishRepeatDialog(String value);
+    }
+
     String alarm_repeat_interval[] ;
     String selected_interval;
     /**
@@ -65,11 +70,15 @@ public class AlarmRepeatSettings extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
+                RepeatDialogListner activity = (RepeatDialogListner) getActivity();
+                activity.onFinishRepeatDialog(selected_interval);
+                dismiss();
             }
         });
         return builder.create();
     }
 
+    //Instance provide to access from the ListView click
     public static AlarmRepeatSettings newInstance() {
         AlarmRepeatSettings frag = new AlarmRepeatSettings();
         return frag;
