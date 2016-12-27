@@ -8,8 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -154,7 +158,7 @@ public class AlarmList extends BaseExpandableListAdapter {
      * @return the View corresponding to the group at the specified position
      */
     @Override
-    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+    public View getGroupView(final int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         String title = (String) this.getGroup(groupPosition);
         if(convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -163,6 +167,58 @@ public class AlarmList extends BaseExpandableListAdapter {
         TextView textView = (TextView) convertView.findViewById(R.id.alarmHeader);
         textView.setTypeface(null, Typeface.BOLD);
         textView.setText(title);
+
+        //Set alarm status based on
+        Switch alarm_toggle_switch = (Switch) convertView.findViewById(R.id.alarm_toggle);
+        boolean switchState;
+
+        if(alarm_list_children != null || alarm_headers != null) {
+            if(alarm_toggle_switch != null) {
+                //default setchecked for switch
+                List<String> temp1 = null;
+                if(alarm_list_children.get(alarm_headers.get(groupPosition)) != null) {
+                    temp1 = (List<String>) alarm_list_children.get(alarm_headers.get(groupPosition)).get("alarmState");
+                }
+                if (temp1 != null) {
+                    if (temp1.get(0).equals("false")) {
+                        switchState = false;
+                    } else {
+                        switchState = true;
+                    }
+                } else {
+                    switchState = false;
+                }
+                alarm_toggle_switch.setChecked(switchState);
+
+                //having an onChange listner
+                alarm_toggle_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            List<String> temp = (List<String>) alarm_list_children.get(alarm_headers.get(groupPosition)).get("alarmState");
+                            if (temp != null) {
+                                temp.set(0, "true");
+                            } else {
+                                List<String> alarm_toggle = new ArrayList<String>();
+                                alarm_toggle.add("true");
+                                alarm_list_children.get(alarm_headers.get(groupPosition)).put("alarmState", alarm_toggle);
+
+                            }
+                        } else {
+                            List<String> temp = (List<String>) alarm_list_children.get(alarm_headers.get(groupPosition)).get("alarmState");
+                            if (temp != null) {
+                                temp.set(0, "false");
+                            } else {
+                                List<String> alarm_toggle = new ArrayList<String>();
+                                alarm_toggle.add("false");
+                                alarm_list_children.get(alarm_headers.get(groupPosition)).put("alarmState", alarm_toggle);
+                            }
+                        }
+
+                    }
+                });
+            }
+        }
         return convertView;
     }
 

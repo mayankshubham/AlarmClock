@@ -119,31 +119,40 @@ public class MainActivity extends AppCompatActivity  implements TimePickerFragme
         super.onResume();
         //loading the expanded view headings
         File headerFile = new File(getDir("ClockMap", MODE_PRIVATE), "list");
+        File childFile = new File(getDir("ClockMap", MODE_PRIVATE), "map");
        try {
-           ObjectInputStream inputStream  = new ObjectInputStream(new FileInputStream(headerFile));
-           headings = (List<String>) inputStream.readObject();
-           inputStream.close();
+           ObjectInputStream inputStream1  = new ObjectInputStream(new FileInputStream(headerFile));
+           headings = (List<String>) inputStream1.readObject();
+           inputStream1.close();
 
-        } catch (IOException e) {
+           ObjectInputStream inputStream2 = new ObjectInputStream(new FileInputStream(childFile));
+           childItems = (HashMap<String, HashMap<String, List<String> > >) inputStream2.readObject();
+           inputStream2.close();
+           Log.d("Headings", "Childs");
+           Log.d( String.valueOf(headings.size()), String.valueOf(childItems.size()));
+           if(headings != null || childItems != null ) {
+               Log.d("Headings", "Childs");
+               Log.d( String.valueOf(headings.size()), String.valueOf(childItems.size()));
+                expandableListView = (ExpandableListView) findViewById(R.id.alarm_list);
+
+                alarmList = new AlarmList(this, headings, childItems);
+                expandableListView.setAdapter(alarmList);
+           }
+
+       } catch (IOException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+       } catch (ClassNotFoundException e) {
+           e.printStackTrace();
+       } catch (NullPointerException e) {
            e.printStackTrace();
        }
-        File childFile = new File(getDir("ClockMap", MODE_PRIVATE), "map");
-        try {
-            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(childFile));
-            childItems = (HashMap<String, HashMap<String, List<String> > >) inputStream.readObject();
-            inputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
 
-        expandableListView = (ExpandableListView) findViewById(R.id.alarm_list);
-
-        alarmList = new AlarmList(this, headings, childItems);
-        expandableListView.setAdapter(alarmList);
+//        if(headings != null && childItems != null) {
+//            expandableListView = (ExpandableListView) findViewById(R.id.alarm_list);
+//
+//            alarmList = new AlarmList(this, headings, childItems);
+//            expandableListView.setAdapter(alarmList);
+//        }
     }
 
     //Creating an expandable List view
