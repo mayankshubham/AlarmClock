@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity  implements TimePickerFragme
         alarmList = new AlarmList(this, headings, childItems);
         expandableListView.setAdapter(alarmList);
 
-
         // OnClick listener on the FAB icon
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_alarm);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -196,17 +195,27 @@ public class MainActivity extends AppCompatActivity  implements TimePickerFragme
 
     //Method to get the repeat alarm setting value
     @Override
-    public void onFinishRepeatDialog(String value) {
+    public void onFinishRepeatDialog(String value, int groupPosition) {
 
+        List<String> repeatSetting = new ArrayList<String>();
         if(value.equals("Custom")) {
+            repeatSetting.add("Custom");
             Log.d("In Finish", value);
             CustomDayRepeatFragment dialog = new CustomDayRepeatFragment();
             dialog.show(getSupportFragmentManager(), DIALOG_REPEAT_SETTING);
         } else if(value.equals("Weekday(Mon-Fri)")) {
+            repeatSetting.add("Weekday(Mon-Fri)");
             Log.d("In weekday", value);
         } else if(value.equals("Weekend(Sat,Sun)")) {
+            repeatSetting.add("Weekend(Sat,Sun)");
             Log.d("In weekday", value);
         }
+        if(childItems.get(headings.get(groupPosition)).get("RepeatDay") == null) {
+            childItems.get(headings.get(groupPosition)).put("RepeatDay", repeatSetting);
+        } else {
+            childItems.get(headings.get(groupPosition)).get("RepeatDay").set(0, value);
+        }
+
     }
 
     //callback interface to get the days selected value in case of custom select

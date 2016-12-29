@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,7 +71,8 @@ public class AlarmList extends BaseExpandableListAdapter {
      */
     @Override
     public int getChildrenCount(int groupPosition) {
-        return alarm_list_children.get(alarm_headers.get(groupPosition)).size();
+        return 1;
+//        return alarm_list_children.get(alarm_headers.get(groupPosition)).size();
     }
 
     /**
@@ -94,7 +96,7 @@ public class AlarmList extends BaseExpandableListAdapter {
      */
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return alarm_list_children.get(alarm_headers.get(groupPosition)).get(childPosition);
+        return alarm_list_children.get(alarm_headers.get(groupPosition));
     }
 
     /**
@@ -214,7 +216,7 @@ public class AlarmList extends BaseExpandableListAdapter {
                                 alarm_list_children.get(alarm_headers.get(groupPosition)).put("alarmState", alarm_toggle);
                             }
                         }
-
+                        notifyDataSetChanged();
                     }
                 });
             }
@@ -253,7 +255,23 @@ public class AlarmList extends BaseExpandableListAdapter {
         alarm_repeat_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlarmRepeatSettings alarmRepeatSettings = AlarmRepeatSettings.newInstance();
+                List<String> repeatInteval = alarm_list_children.get(alarm_headers.get(groupPosition)).get("RepeatDay");
+                String Value;
+                int valueIndex = -1;
+                if(repeatInteval != null) {
+                   Value = repeatInteval.get(0);
+                    Log.d("Interval value", Value);
+                   switch(Value) {
+                        case "Custom": valueIndex = 0;
+                            break;
+                       case "Weekday(Mon-Fri)": valueIndex = 1;
+                           break;
+                       case "Weekend(Sat,Sun)": valueIndex = 2;
+                           break;
+                    }
+                }
+
+                AlarmRepeatSettings alarmRepeatSettings = AlarmRepeatSettings.newInstance(groupPosition, valueIndex);
                 alarmRepeatSettings.show(((MainActivity)context).getSupportFragmentManager(), DIALOG_SINGLE_CHOICE_LIST);
             }
         });

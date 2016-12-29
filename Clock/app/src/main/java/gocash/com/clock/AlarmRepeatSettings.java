@@ -6,6 +6,17 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
+import android.widget.ExpandableListView;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.HashMap;
+import java.util.List;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by la-skhatri on 12/22/2016.
@@ -15,7 +26,7 @@ public class AlarmRepeatSettings extends DialogFragment {
 
     //public interface to send the value to main activity
     public interface RepeatDialogListner {
-        void onFinishRepeatDialog(String value);
+        void onFinishRepeatDialog(String value, int groupPosition);
     }
 
     String alarm_repeat_interval[] ;
@@ -50,9 +61,13 @@ public class AlarmRepeatSettings extends DialogFragment {
         //defining the alarm_repeat_interval string
         alarm_repeat_interval = getResources().getStringArray(R.array.alarm_repeat_interval);
 
+        final int groupPosition = getArguments().getInt("position");
+
+        int selected_value = getArguments().getInt("valueIndex", -1);
+
         //setting the alert dialog title and the type of items contained in it.
         //First parameter is the list, second is the already checked item, third is the listner object
-        builder.setTitle("Choose Repeat Interval").setSingleChoiceItems(alarm_repeat_interval, -1, new DialogInterface.OnClickListener() {
+        builder.setTitle("Choose Repeat Interval").setSingleChoiceItems(alarm_repeat_interval, selected_value, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
@@ -71,16 +86,23 @@ public class AlarmRepeatSettings extends DialogFragment {
             public void onClick(DialogInterface dialog, int which) {
 
                 RepeatDialogListner activity = (RepeatDialogListner) getActivity();
-                activity.onFinishRepeatDialog(selected_interval);
+                activity.onFinishRepeatDialog(selected_interval, groupPosition);
                 dismiss();
             }
         });
         return builder.create();
     }
 
+
+
     //Instance provide to access from the ListView click
-    public static AlarmRepeatSettings newInstance() {
+    public static AlarmRepeatSettings newInstance(int groupPosition, int valueIndex) {
         AlarmRepeatSettings frag = new AlarmRepeatSettings();
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("position", groupPosition);
+        bundle.putInt("valueIndex", valueIndex);
+        frag.setArguments(bundle);
         return frag;
     }
 }
