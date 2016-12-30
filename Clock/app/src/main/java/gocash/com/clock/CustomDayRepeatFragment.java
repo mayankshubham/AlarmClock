@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
@@ -18,10 +19,10 @@ import java.util.List;
 public class CustomDayRepeatFragment extends DialogFragment {
 
     public interface DayRepeatListner {
-        void onFinishDayRepeatListner(List<String> days);
+        void onFinishDayRepeatListner(List<Integer> days, int groupPosition);
     }
     //List to save the result
-    private ArrayList<String> selectedDays;
+    private ArrayList<Integer> selectedDays;
     String weekdays[];
     /**
      * Override to build your own custom Dialog container.  This is typically
@@ -49,30 +50,65 @@ public class CustomDayRepeatFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         selectedDays = new ArrayList<>();
 
+
+        final int groupPosition = getArguments().getInt("position");
+        final List<Integer> daysSelected = (List<Integer>) getArguments().getIntegerArrayList("dayList");
+
+        //Initialising the default Checked value
+        boolean []defaultChecked = new boolean[7];
+        for(int i = 0; i < 7; i++) {
+            defaultChecked[i] = false;
+        }
+
+        if(daysSelected != null) {
+            for(int i = 0; i < daysSelected.size(); i++) {
+                defaultChecked[daysSelected.get(i)] =  true;
+                selectedDays.add(daysSelected.get(i));
+            }
+        }
+        Log.d("Selected day Size", String.valueOf(daysSelected.size()));
+        for (int i = 0; i < daysSelected.size(); i++) {
+            Log.d("DayIndex", String.valueOf(daysSelected.get(i)));
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         weekdays = getResources().getStringArray(R.array.weekdays);
         Log.d("In dialog", "Custom");
         builder.setTitle("Select Days to Repeat")
-                .setMultiChoiceItems(weekdays, null, new DialogInterface.OnMultiChoiceClickListener() {
+                .setMultiChoiceItems(weekdays, defaultChecked, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                         if(isChecked) {
-                            selectedDays.add(weekdays[which]);
-                        } else if (selectedDays.contains(weekdays[which])) {
-                            selectedDays.remove(String.valueOf(weekdays[which]));
+                            selectedDays.add(which);
+                        } else if (selectedDays.contains(which)) {
+                            selectedDays.remove(which);
                         }
                     }
                 })
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+
+                        DayRepeatListner activity = (DayRepeatListner)getActivity();
+                        activity.onFinishDayRepeatListner(selectedDays, groupPosition);
                         for(int i = 0; i < selectedDays.size(); i++) {
-                            Log.d("Selected Days", selectedDays.get(i));
+                            Log.d("Selected Days", String.valueOf(selectedDays.get(i)));
                         }
 
                     }
                 });
 
         return builder.create();
+    }
+
+    //Creating a fragment instance class to pass the parameters
+    public static CustomDayRepeatFragment newInstance(int groupPosition, List<Integer> daysSelected) {
+        CustomDayRepeatFragment fragment = new CustomDayRepeatFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("position",groupPosition);
+        bundle.putIntegerArrayList("dayList", (ArrayList<Integer>) daysSelected);
+        fragment.setArguments(bundle);
+
+        return fragment;
     }
 }

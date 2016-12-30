@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -197,30 +198,68 @@ public class MainActivity extends AppCompatActivity  implements TimePickerFragme
     @Override
     public void onFinishRepeatDialog(String value, int groupPosition) {
 
-        List<String> repeatSetting = new ArrayList<String>();
+        List<String> repeatSetting = new ArrayList<String>();           //Arraylist storing options like CUSTOM, WEEKDAY, WEEKEND
+        List<String> repeatDOW = new ArrayList<>();
+        List<Integer> selectedDOW = new ArrayList<>();
+
+        //Initialising all days of week to be unselected
+        for(int i = 0; i < 7; i++) {
+            repeatDOW.add("false");
+        }
         if(value.equals("Custom")) {
             repeatSetting.add("Custom");
-            Log.d("In Finish", value);
-            CustomDayRepeatFragment dialog = new CustomDayRepeatFragment();
+            //checking the days selected
+            if(childItems.get(headings.get(groupPosition)).get("RepeatDOW") != null) {
+                for(int i = 0; i < 7; i++) {
+                    if(childItems.get(headings.get(groupPosition)).get("RepeatDOW").get(i).equals("true")) {
+                        selectedDOW.add(i);
+                    }
+
+                }
+            }
+
+            CustomDayRepeatFragment dialog = CustomDayRepeatFragment.newInstance(groupPosition, selectedDOW);
             dialog.show(getSupportFragmentManager(), DIALOG_REPEAT_SETTING);
         } else if(value.equals("Weekday(Mon-Fri)")) {
+
+            //Loop to update the days status
+            for(int i = 0; i < 5; i++) {
+                repeatDOW.set(i, "true");
+            }
             repeatSetting.add("Weekday(Mon-Fri)");
-            Log.d("In weekday", value);
         } else if(value.equals("Weekend(Sat,Sun)")) {
+            //Loop to update the days status
+            for(int i = 5; i < 7; i++) {
+                repeatDOW.set(i, "true");
+            }
             repeatSetting.add("Weekend(Sat,Sun)");
-            Log.d("In weekday", value);
         }
+
+        //checking to update state if it already exits else create a new one for RepeatDay
         if(childItems.get(headings.get(groupPosition)).get("RepeatDay") == null) {
             childItems.get(headings.get(groupPosition)).put("RepeatDay", repeatSetting);
         } else {
             childItems.get(headings.get(groupPosition)).get("RepeatDay").set(0, value);
         }
 
+        //checking to update state if it already exits else create a new one for RepeatDOW
+        childItems.get(headings.get(groupPosition)).put("RepeatDOW", repeatDOW);
+
+
+
     }
 
     //callback interface to get the days selected value in case of custom select
     @Override
-    public void onFinishDayRepeatListner(List<String> days) {
+    public void onFinishDayRepeatListner(List<Integer> days, int groupPosition) {
+        for(int i = 0; i < 7; i++) {
+            childItems.get(headings.get(groupPosition)).get("RepeatDOW").set(i, "false");
+        }
+        for(int i = 0; i < days.size(); i++) {
+             childItems.get(headings.get(groupPosition)).get("RepeatDOW").set(days.get(i), "true");
+
+        }
+
 
     }
 

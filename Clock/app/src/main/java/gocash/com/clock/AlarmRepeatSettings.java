@@ -64,7 +64,9 @@ public class AlarmRepeatSettings extends DialogFragment {
         final int groupPosition = getArguments().getInt("position");
 
         int selected_value = getArguments().getInt("valueIndex", -1);
-
+        if(selected_value > -1) {
+            selected_interval = alarm_repeat_interval[selected_value];
+        }
         //setting the alert dialog title and the type of items contained in it.
         //First parameter is the list, second is the already checked item, third is the listner object
         builder.setTitle("Choose Repeat Interval").setSingleChoiceItems(alarm_repeat_interval, selected_value, new DialogInterface.OnClickListener() {
