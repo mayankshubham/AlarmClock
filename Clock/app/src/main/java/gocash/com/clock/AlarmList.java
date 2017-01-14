@@ -173,7 +173,6 @@ public class AlarmList extends BaseExpandableListAdapter {
         //Set alarm status based on
         Switch alarm_toggle_switch = (Switch) convertView.findViewById(R.id.alarm_toggle);
         boolean switchState;
-
         if(alarm_list_children != null || alarm_headers != null) {
             if(alarm_toggle_switch != null) {
                 //default setchecked for switch
@@ -216,7 +215,10 @@ public class AlarmList extends BaseExpandableListAdapter {
                                 alarm_list_children.get(alarm_headers.get(groupPosition)).put("alarmState", alarm_toggle);
                             }
                         }
+                        //updating the original data and notifying it to change the list view
                         notifyDataSetChanged();
+                        //calling the main activity method
+                        ((MainActivity)context).onAlarmToggleStateChange(groupPosition, isChecked);
                     }
                 });
             }

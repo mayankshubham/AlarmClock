@@ -2,6 +2,7 @@ package gocash.com.clock;
 
 import android.app.AlarmManager;
 import android.app.FragmentTransaction;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity  implements TimePickerFragme
 
     // Defining the Alarm manager variables
     AlarmManager alarm_manager;      /// An alarm instance
+    PendingIntent pendingIntent;     // Pending intent for the alarm receiver class
     Context context;
     ExpandableListView expandableListView; //
     List<String> headings = new ArrayList<String>();
@@ -260,6 +262,28 @@ public class MainActivity extends AppCompatActivity  implements TimePickerFragme
 
         }
 
+
+    }
+
+    //Method to monitor the toggle state of alarm
+    public void onAlarmToggleStateChange(int groupPosition, boolean state) {
+        Log.d("In alarmtoggle", String.valueOf(groupPosition));
+        Log.d("Toggle State", String.valueOf(state));
+
+        if(state == true) {
+            setRepeatingAlarm(groupPosition);
+        } else {
+            cancelRepeatingAlarm(groupPosition);
+        }
+    }
+
+    //set the alarm
+    public void setRepeatingAlarm(int groupPosition) {
+
+    }
+
+    //cancel the alarm
+    public void cancelRepeatingAlarm(int groupPosition) {
 
     }
 
